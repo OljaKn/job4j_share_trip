@@ -8,8 +8,8 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"job4j.ru/go-share-trip/configs"
 	"job4j.ru/go-share-trip/internal/api"
+	"job4j.ru/go-share-trip/internal/repositories"
 	"job4j.ru/go-share-trip/internal/service"
-	"job4j.ru/go-share-trip/internal/storage"
 )
 
 func main() {
@@ -23,7 +23,7 @@ func main() {
 	}
 	defer dbPool.Close()
 
-	repo := storage.NewRepoPg(dbPool)
+	repo := repositories.NewRepoPg(dbPool)
 	service := service.NewServer(repo)
 	handler := api.NewHandler(service)
 	app := fiber.New()
