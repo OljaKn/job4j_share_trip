@@ -38,11 +38,11 @@ func (h *Handler) CreateTrip(c *fiber.Ctx) error {
 		DepartureTime: req.DepartureTime,
 		Seats:         req.Seats,
 	}
-	err := h.server.CreateTrip(c.Context(), cmd)
+	trip, err := h.server.CreateTrip(c.Context(), cmd)
 	if err != nil {
 		log.Errorw("s.Repository.Create", err)
 		return fiber.NewError(fiber.StatusInternalServerError, "internal server error")
 	}
 
-	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"status": "created"})
+	return c.Status(fiber.StatusCreated).JSON(trip)
 }

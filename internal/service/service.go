@@ -1,13 +1,13 @@
 package service
 
 import (
-	"job4j.ru/go-share-trip/internal/repositories"
+	"job4j.ru/go-share-trip/internal/domain"
 )
 
 type Service struct {
-	Repository *repositories.RepoPg
+	Repository domain.TripRepository
 }
 
-func NewServer(repo *repositories.RepoPg) *Service {
+func NewServer(repo domain.TripRepository) *Service {
 	return &Service{Repository: repo}
 }
