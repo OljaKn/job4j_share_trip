@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 )
 
 func NewTrip(driverId uuid.UUID, fromPoint string, toPoint string, departureTime time.Time, seats int) (*Trip, error) {
@@ -28,13 +29,13 @@ func NewTrip(driverId uuid.UUID, fromPoint string, toPoint string, departureTime
 	}, nil
 }
 
-func CreateTrip(ctx context.Context, repo TripRepository, driverId uuid.UUID, fromPoint string, toPoint string, departureTime time.Time, seats int) (*Trip, error) {
+func CreateTrip(ctx context.Context, tx pgx.Tx, repo TripRepository, driverId uuid.UUID, fromPoint string, toPoint string, departureTime time.Time, seats int) (*Trip, error) {
 	trip, err := NewTrip(driverId, fromPoint, toPoint, departureTime, seats)
 	if err != nil {
 		return nil, err
 	}
 
-	err = repo.Create(ctx, trip)
+	err = repo.Create(ctx, tx, trip)
 	if err != nil {
 		return nil, err
 	}

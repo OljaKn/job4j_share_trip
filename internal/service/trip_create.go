@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 	"job4j.ru/go-share-trip/internal/domain"
 )
 
@@ -17,13 +18,16 @@ type CreateTripCommand struct {
 }
 
 func (s *Service) CreateTrip(ctx context.Context, com CreateTripCommand) (*domain.Trip, error) {
-	return domain.CreateTrip(
-		ctx,
-		s.Repository,
-		com.DriverId,
-		com.FromPoint,
-		com.ToPoint,
-		com.DepartureTime,
-		com.Seats,
-	)
+	return tx(ctx, s.pool, func(tx pgx.Tx) (*domain.Trip, error) {
+		return domain.CreateTrip(
+			ctx,
+			tx,
+			s.Repository,
+			com.DriverId,
+			com.FromPoint,
+			com.ToPoint,
+			com.DepartureTime,
+			com.Seats,
+		)
+	})
 }

@@ -24,7 +24,7 @@ func main() {
 	defer dbPool.Close()
 
 	repo := repositories.NewRepoPg(dbPool)
-	service := service.NewServer(repo)
+	service := service.NewServer(repo, dbPool)
 	handler := api.NewHandler(service)
 	app := fiber.New()
 	handler.Route(app)
