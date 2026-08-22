@@ -15,4 +15,5 @@ type Trip struct {
 	Seats         int
 	Status        StatusTrip
 	CreatedAt     time.Time
+	Version       int
 }

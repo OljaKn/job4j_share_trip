@@ -3,6 +3,7 @@ package domain
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
@@ -14,9 +15,9 @@ func MoveTripDraftToPublish(
 	repo TripRepository,
 	tripID, driverID uuid.UUID,
 ) (*Trip, error) {
-	trip, err := repo.GetForUpdateByID(ctx, tx, tripID)
+	trip, err := repo.Get(ctx, tripID)
 	if err != nil {
-		return nil, fmt.Errorf("tripRepository.GetForUpdateByID: %w", err)
+		return nil, fmt.Errorf("tripRepository.Get: %w", err)
 	}
 
 	if trip.DriverId != driverID {
@@ -33,8 +34,16 @@ func MoveTripDraftToPublish(
 
 	fromStatus := trip.Status
 	trip.Status = Public
+	payload := fmt.Sprintf(`{"trip_id": "%s"}`, tripID)
+	event := OutboxEvent{
+		Id:          uuid.New(),
+		EventName:   "event_published",
+		AggregateId: tripID,
+		Payload:     payload,
+		CreatedAt:   time.Now(),
+	}
 
-	updatedTrip, err := repo.Update(ctx, tx, trip, fromStatus)
+	updatedTrip, err := repo.Update(ctx, tx, trip, event, fromStatus)
 	if err != nil {
 		return nil, fmt.Errorf("tripRepository.Update: %w", err)
 	}
