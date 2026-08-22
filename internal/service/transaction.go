@@ -17,7 +17,9 @@ func tx[T any](
 	if err != nil {
 		return nil, fmt.Errorf("failed to begin transaction: %w", err)
 	}
-	defer txBegin.Rollback(ctx)
+	defer func() {
+		_ = txBegin.Rollback(ctx)
+	}()
 
 	res, err := block(txBegin)
 	if err != nil {
