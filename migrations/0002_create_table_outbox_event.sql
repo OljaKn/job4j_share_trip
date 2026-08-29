@@ -1,16 +1,19 @@
 -- +goose Up
 -- +goose StatementBegin
-create table outbox_event (
-    id uuid primary key,
-    event_name text not null,
-    aggregate_id bigint not null,
-    payload jsonb not null,
-    created_at timestamptz not null default now()
+
+CREATE TABLE outbox_event (
+    id UUID PRIMARY KEY,
+    event_name TEXT NOT NULL,
+    aggregate_id UUID NOT NULL,
+    payload JSONB NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
 -- +goose StatementEnd
 
 -- +goose Down
 -- +goose StatementBegin
 
 DROP TABLE IF EXISTS outbox_event;
+
 -- +goose StatementEnd

@@ -26,7 +26,6 @@ func NewTrip(driverId uuid.UUID, fromPoint string, toPoint string, departureTime
 		Seats:         seats,
 		Status:        Draft,
 		CreatedAt:     time.Now(),
-		Version:       1,
 	}, nil
 }
 

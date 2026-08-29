@@ -7,10 +7,11 @@ import (
 )
 
 type Service struct {
-	Repository domain.TripRepository
-	pool       *pgxpool.Pool
+	Repository       domain.TripRepository
+	OutboxRepository domain.OutboxRepository
+	pool             *pgxpool.Pool
 }
 
-func NewServer(repo domain.TripRepository, pool *pgxpool.Pool) *Service {
-	return &Service{Repository: repo, pool: pool}
+func NewServer(repo domain.TripRepository, event domain.OutboxRepository, pool *pgxpool.Pool) *Service {
+	return &Service{Repository: repo, OutboxRepository: event, pool: pool}
 }
