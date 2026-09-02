@@ -8,8 +8,6 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-// MoveTripDraftToPublish переводит поездку из draft в published.
-// Второй bool — true, если статус реально изменился (нужно писать outbox).
 func MoveTripDraftToPublish(
 	ctx context.Context,
 	tx pgx.Tx,
