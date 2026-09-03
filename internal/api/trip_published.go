@@ -15,7 +15,7 @@ type PublishTripRequest struct {
 	DriverId uuid.UUID `json:"driver_id"`
 }
 
-func (h *Handler) PublishTrip(c *fiber.Ctx) error {
+func (h *Server) PublishTrip(c *fiber.Ctx) error {
 	var req PublishTripRequest
 	if err := c.BodyParser(&req); err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, "invalid JSON body")

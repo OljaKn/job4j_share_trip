@@ -5,7 +5,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (h *Handler) GetTrip(c *fiber.Ctx) error {
+func (h *Server) GetTrip(c *fiber.Ctx) error {
 	id := c.Params("id")
 	if id == "" {
 		return fiber.NewError(fiber.StatusBadRequest, "id is required")

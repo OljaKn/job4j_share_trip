@@ -4,12 +4,12 @@ import (
 	"job4j.ru/go-share-trip/internal/service"
 )
 
-type Handler struct {
+type Server struct {
 	server *service.Service
 }
 
-func NewHandler(server *service.Service) *Handler {
-	return &Handler{
+func NewServer(server *service.Service) *Server {
+	return &Server{
 		server: server,
 	}
 }

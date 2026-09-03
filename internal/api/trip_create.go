@@ -18,9 +18,17 @@ type CreateTripRequest struct {
 }
 
 type CreateTripResponse struct {
+	ID            uuid.UUID `json:"id"`
+	DriverId      uuid.UUID `json:"driver_id"`
+	FromPoint     string    `json:"from_point"`
+	ToPoint       string    `json:"to_point"`
+	DepartureTime time.Time `json:"departure_time"`
+	Seats         int       `json:"seats"`
+	Status        string    `json:"trip_status"`
+	CreatedAt     time.Time `json:"created_at"`
 }
 
-func (h *Handler) CreateTrip(c *fiber.Ctx) error {
+func (h *Server) CreateTrip(c *fiber.Ctx) error {
 	var req CreateTripRequest
 	if err := c.BodyParser(&req); err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, "invalid JSON body")
@@ -44,5 +52,14 @@ func (h *Handler) CreateTrip(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusInternalServerError, "internal server error")
 	}
 
-	return c.Status(fiber.StatusCreated).JSON(trip)
+	return c.Status(fiber.StatusCreated).JSON(CreateTripResponse{
+		ID:            trip.Id,
+		DriverId:      trip.DriverId,
+		FromPoint:     trip.FromPoint,
+		ToPoint:       trip.ToPoint,
+		DepartureTime: trip.DepartureTime,
+		Seats:         trip.Seats,
+		Status:        string(trip.Status),
+		CreatedAt:     trip.CreatedAt,
+	})
 }

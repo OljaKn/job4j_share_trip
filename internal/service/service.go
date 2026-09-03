@@ -12,6 +12,6 @@ type Service struct {
 	pool             *pgxpool.Pool
 }
 
-func NewServer(repo domain.TripRepository, event domain.OutboxRepository, pool *pgxpool.Pool) *Service {
+func NewTripService(repo domain.TripRepository, event domain.OutboxRepository, pool *pgxpool.Pool) *Service {
 	return &Service{Repository: repo, OutboxRepository: event, pool: pool}
 }

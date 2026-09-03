@@ -25,8 +25,8 @@ func main() {
 
 	repo := repositories.NewRepoPg(dbPool)
 	outboxRepo := repositories.NewOutboxRepo(dbPool)
-	service := service.NewServer(repo, outboxRepo, dbPool)
-	handler := api.NewHandler(service)
+	service := service.NewTripService(repo, outboxRepo, dbPool)
+	handler := api.NewServer(service)
 	app := fiber.New()
 	handler.Route(app)
 
