@@ -1,7 +1,7 @@
 GO := go
 PKG := ./...
 
-.PHONY: deps fmt test lint build run up down migrate-up migrate-down migrate-status check
+.PHONY: deps fmt test lint build run up down migrate-up migrate-down migrate-status check coverage
 
 deps:
 	go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest
@@ -29,3 +29,5 @@ check:
 	fmt lint test
 e2e:
 	curl http://localhost:8080/ready
+coverage:
+	go test ./... -cover
