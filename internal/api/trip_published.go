@@ -14,6 +14,10 @@ type PublishTripRequest struct {
 	TripId   uuid.UUID `json:"trip_id"`
 	DriverId uuid.UUID `json:"driver_id"`
 }
+type PublishTripResponse struct {
+	TripId uuid.UUID `json:"trip_id"`
+	Status string    `json:"status"`
+}
 
 func (h *Server) PublishTrip(c *fiber.Ctx) error {
 	var req PublishTripRequest
@@ -45,5 +49,8 @@ func (h *Server) PublishTrip(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusInternalServerError, "internal server error")
 	}
 
-	return c.Status(fiber.StatusOK).JSON(trip)
+	return c.Status(fiber.StatusOK).JSON(PublishTripResponse{
+		TripId: trip.Id,
+		Status: string(trip.Status),
+	})
 }

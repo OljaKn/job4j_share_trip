@@ -62,7 +62,7 @@ func (r *RepoPg) Update(
 
 	_, err = tx.Exec(ctx,
 		`INSERT INTO trip_history(id, trip_id, to_status, created_at)
-		VALUES ($1, $2, $3, $4, $5)`,
+		VALUES ($1, $2, $3, $4)`,
 		uuid.New(), trip.Id, trip.Status, time.Now())
 	if err != nil {
 		return nil, fmt.Errorf("insert history: %w", err)
