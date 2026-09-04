@@ -15,7 +15,9 @@ import (
 )
 
 func TestServer_PublishTrip(t *testing.T) {
+	t.Parallel()
 	t.Run("success - перевод поездки в статус Опубликована", func(t *testing.T) {
+		t.Parallel()
 		tripId := uuid.New()
 		driverId := uuid.New()
 		trip := domain.Trip{

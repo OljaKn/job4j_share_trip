@@ -20,8 +20,8 @@ func (r *RepoPg) Create(ctx context.Context, tx pgx.Tx, tr *domain.Trip) error {
 	}
 	_, err = tx.Exec(
 		ctx,
-		`INSERT INTO trip_history(id, trip_id, from_status, to_status, created_at) VALUES($1, $2, $3, $4, $5)`,
-		uuid.New(), tr.Id, nil, tr.Status, tr.CreatedAt,
+		`INSERT INTO trip_history(id, trip_id, to_status, created_at) VALUES($1, $2, $3, $4)`,
+		uuid.New(), tr.Id, tr.Status, tr.CreatedAt,
 	)
 	if err != nil {
 		return fmt.Errorf("tx.Exec insert history: %w", err)

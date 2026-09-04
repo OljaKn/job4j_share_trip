@@ -14,7 +14,9 @@ import (
 )
 
 func TestServer_CreateTrip(t *testing.T) {
+	t.Parallel()
 	t.Run("success - создание поездки", func(t *testing.T) {
+		t.Parallel()
 		payload := api.CreateTripRequest{
 			DriverId:      uuid.New(),
 			FromPoint:     "Казань",
