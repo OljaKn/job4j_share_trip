@@ -42,8 +42,11 @@ func (h *Server) PublishTrip(c *fiber.Ctx) error {
 		if errors.Is(err, domain.ErrForbidden) {
 			return fiber.NewError(fiber.StatusForbidden, "forbidden")
 		}
-		if errors.Is(err, domain.ErrInvalidStatus) {
+		if errors.Is(err, domain.ErrConflict) {
 			return fiber.NewError(fiber.StatusConflict, "invalid trip status")
+		}
+		if errors.Is(err, domain.ErrTripAlreadyPublished) {
+			return fiber.NewError(fiber.StatusNoContent, "trip already published")
 		}
 		log.Errorw("PublishTrip", err)
 		return fiber.NewError(fiber.StatusInternalServerError, "internal server error")

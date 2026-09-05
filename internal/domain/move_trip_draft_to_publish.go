@@ -24,11 +24,11 @@ func MoveTripDraftToPublish(
 	}
 
 	if trip.Status == Public {
-		return trip, false, nil
+		return trip, false, fmt.Errorf("%w: status trip : %s", ErrTripAlreadyPublished, trip.Status)
 	}
 
 	if trip.Status != Draft {
-		return nil, false, fmt.Errorf("%w: expected %s, got %s", ErrInvalidStatus, Draft, trip.Status)
+		return nil, false, fmt.Errorf("%w: expected %s, got %s", ErrConflict, Draft, trip.Status)
 	}
 	trip.Status = Public
 	updatedTrip, err := repo.Update(ctx, tx, trip)
