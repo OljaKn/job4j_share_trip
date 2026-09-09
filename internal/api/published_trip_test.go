@@ -28,7 +28,7 @@ func TestServer_PublishTrip(t *testing.T) {
 			DepartureTime: time.Now().Add(1 * time.Hour).UTC().Truncate(time.Second),
 			Seats:         3,
 			Status:        domain.Draft,
-			CreatedAt:     time.Now().UTC(),
+			CreatedAt:     time.Now().UTC().Truncate(time.Microsecond),
 		}
 		_, err := testPool.Exec(testCtx, `insert into trips (id, driver_id, from_point, to_point, departure_time, seats, status, created_at)
 		values ($1,$2,$3,$4,$5,$6,$7,$8)`,
@@ -66,8 +66,24 @@ func TestServer_PublishTrip(t *testing.T) {
 		err = json.Unmarshal(respBody, &got)
 		require.NoError(t, err)
 
-		require.NotEqual(t, uuid.Nil, got.TripId)
-		require.Equal(t, "published", got.Status)
+		expected := api.PublishTripResponse{
+			ID:            tripId,
+			DriverId:      driverId,
+			FromPoint:     "Казань",
+			ToPoint:       "Москва",
+			DepartureTime: trip.DepartureTime,
+			Seats:         3,
+			Status:        "published",
+			CreatedAt:     trip.CreatedAt,
+		}
+		require.Equal(t, expected.ID, got.ID)
+		require.Equal(t, expected.DriverId, got.DriverId)
+		require.Equal(t, expected.FromPoint, got.FromPoint)
+		require.Equal(t, expected.ToPoint, got.ToPoint)
+		require.WithinDuration(t, expected.DepartureTime, got.DepartureTime, time.Second)
+		require.Equal(t, expected.Seats, got.Seats)
+		require.Equal(t, expected.Status, got.Status)
+		require.WithinDuration(t, expected.CreatedAt, got.CreatedAt, time.Second)
 	})
 
 }

@@ -2,6 +2,7 @@ package api
 
 import (
 	"errors"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
@@ -15,8 +16,14 @@ type PublishTripRequest struct {
 	DriverId uuid.UUID `json:"driver_id"`
 }
 type PublishTripResponse struct {
-	TripId uuid.UUID `json:"trip_id"`
-	Status string    `json:"status"`
+	ID            uuid.UUID `json:"id"`
+	DriverId      uuid.UUID `json:"driver_id"`
+	FromPoint     string    `json:"from_point"`
+	ToPoint       string    `json:"to_point"`
+	DepartureTime time.Time `json:"departure_time"`
+	Seats         int       `json:"seats"`
+	Status        string    `json:"status"`
+	CreatedAt     time.Time `json:"created_at"`
 }
 
 func (h *Server) PublishTrip(c *fiber.Ctx) error {
@@ -53,7 +60,13 @@ func (h *Server) PublishTrip(c *fiber.Ctx) error {
 	}
 
 	return c.Status(fiber.StatusOK).JSON(PublishTripResponse{
-		TripId: trip.Id,
-		Status: string(trip.Status),
+		ID:            trip.Id,
+		DriverId:      trip.DriverId,
+		FromPoint:     trip.FromPoint,
+		ToPoint:       trip.ToPoint,
+		DepartureTime: trip.DepartureTime,
+		Seats:         trip.Seats,
+		Status:        string(trip.Status),
+		CreatedAt:     trip.CreatedAt,
 	})
 }
