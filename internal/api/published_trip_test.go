@@ -66,24 +66,20 @@ func TestServer_PublishTrip(t *testing.T) {
 		err = json.Unmarshal(respBody, &got)
 		require.NoError(t, err)
 
+		got.DepartureTime = got.DepartureTime.UTC()
+		got.CreatedAt = got.CreatedAt.UTC()
+
 		expected := api.PublishTripResponse{
 			ID:            tripId,
 			DriverId:      driverId,
 			FromPoint:     "Казань",
 			ToPoint:       "Москва",
-			DepartureTime: trip.DepartureTime,
+			DepartureTime: trip.DepartureTime.UTC(),
 			Seats:         3,
 			Status:        "published",
-			CreatedAt:     trip.CreatedAt,
+			CreatedAt:     trip.CreatedAt.UTC(),
 		}
-		require.Equal(t, expected.ID, got.ID)
-		require.Equal(t, expected.DriverId, got.DriverId)
-		require.Equal(t, expected.FromPoint, got.FromPoint)
-		require.Equal(t, expected.ToPoint, got.ToPoint)
-		require.WithinDuration(t, expected.DepartureTime, got.DepartureTime, time.Second)
-		require.Equal(t, expected.Seats, got.Seats)
-		require.Equal(t, expected.Status, got.Status)
-		require.WithinDuration(t, expected.CreatedAt, got.CreatedAt, time.Second)
+		require.Equal(t, expected, got)
 	})
 
 }
