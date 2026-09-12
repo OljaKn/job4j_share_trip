@@ -70,7 +70,7 @@ func (h *Server) CreateTrip(c *fiber.Ctx) error {
 		DepartureTime: req.DepartureTime,
 		Seats:         req.Seats,
 	}
-	trip, err := h.server.CreateTrip(c.Context(), cmd)
+	trip, err := h.server.CreateTrip(ctx, cmd)
 	if err != nil {
 		logger.Error(
 			"create trip failed",
