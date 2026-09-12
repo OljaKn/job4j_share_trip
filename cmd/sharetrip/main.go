@@ -19,7 +19,11 @@ func main() {
 	if err != nil {
 		log.Fatal("failed to init logger:", err)
 	}
-	defer logFile.Close()
+	defer func() {
+		if err := logFile.Close(); err != nil {
+			log.Printf("failed to close log file: %v", err)
+		}
+	}()
 	configs.InitConfig()
 	dbUrl := configs.GetDBConfig().DSN()
 
@@ -35,7 +39,6 @@ func main() {
 	service := service.NewTripService(repo, outboxRepo, dbPool)
 	handler := api.NewServer(service)
 	app := fiber.New()
-	handler.Route(app)
 
 	app.Use(middleware.Correlation(logger))
 
