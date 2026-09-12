@@ -1,11 +1,12 @@
 package api
 
 import (
+	"log/slog"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/log"
 	"github.com/google/uuid"
+	"job4j.ru/go-share-trip/internal/observability/logctx"
 	"job4j.ru/go-share-trip/internal/service"
 )
 
@@ -29,16 +30,39 @@ type CreateTripResponse struct {
 }
 
 func (h *Server) CreateTrip(c *fiber.Ctx) error {
+	ctx := c.UserContext()
+
+	logger := logctx.Logger(ctx).With(
+		slog.String("server", "TripServer"),
+		slog.String("handler", "CreateTrip"),
+	)
 	var req CreateTripRequest
 	if err := c.BodyParser(&req); err != nil {
+		logger.Warn(
+			"create trip failed: invalid json body",
+			slog.Any("error", err),
+		)
 		return fiber.NewError(fiber.StatusBadRequest, "invalid JSON body")
 	}
+	if req.DriverId == uuid.Nil {
+		logger.Warn("create trip failed: client_id is required")
+		return fiber.NewError(fiber.StatusBadRequest, "driver_id is required")
+	}
 	if req.FromPoint == "" {
+		logger.Warn("create trip failed: fromPoint is required")
 		return fiber.NewError(fiber.StatusBadRequest, "point of departure is required")
 	}
 	if req.ToPoint == "" {
+		logger.Warn("create trip failed: toPoint is required")
 		return fiber.NewError(fiber.StatusBadRequest, "point of arrival is required")
 	}
+	logger = logger.With(
+		slog.String("client_id", req.DriverId.String()),
+	)
+
+	ctx = logctx.WithLogger(ctx, logger)
+
+	logger.Info("create trip request accepted")
 	cmd := service.CreateTripCommand{
 		DriverId:      req.DriverId,
 		FromPoint:     req.FromPoint,
@@ -48,10 +72,17 @@ func (h *Server) CreateTrip(c *fiber.Ctx) error {
 	}
 	trip, err := h.server.CreateTrip(c.Context(), cmd)
 	if err != nil {
-		log.Errorw("s.Repository.Create", err)
+		logger.Error(
+			"create trip failed",
+			slog.Any("error", err),
+		)
+		//log.Errorw("s.Repository.Create", err)
 		return fiber.NewError(fiber.StatusInternalServerError, "internal server error")
 	}
-
+	logger.Info(
+		"create trip completed",
+		slog.String("trip_id", trip.Id.String()),
+	)
 	return c.Status(fiber.StatusCreated).JSON(CreateTripResponse{
 		ID:            trip.Id,
 		DriverId:      trip.DriverId,

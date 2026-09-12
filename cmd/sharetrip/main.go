@@ -8,11 +8,18 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"job4j.ru/go-share-trip/configs"
 	"job4j.ru/go-share-trip/internal/api"
+	"job4j.ru/go-share-trip/internal/app"
+	"job4j.ru/go-share-trip/internal/middleware"
 	"job4j.ru/go-share-trip/internal/repositories"
 	"job4j.ru/go-share-trip/internal/service"
 )
 
 func main() {
+	logger, logFile, err := app.NewLogger()
+	if err != nil {
+		log.Fatal("failed to init logger:", err)
+	}
+	defer logFile.Close()
 	configs.InitConfig()
 	dbUrl := configs.GetDBConfig().DSN()
 
@@ -29,6 +36,10 @@ func main() {
 	handler := api.NewServer(service)
 	app := fiber.New()
 	handler.Route(app)
+
+	app.Use(middleware.Correlation(logger))
+
+	handler.Route(app.Group(""))
 
 	log.Fatal(app.Listen(":8080"))
 }

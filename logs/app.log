@@ -1,0 +1,16 @@
+{"time":"2026-09-11T15:28:06.70215+03:00","level":"INFO","msg":"Loading env file"}
+{"time":"2026-09-11T15:28:56.2074905+03:00","level":"INFO","msg":"create trip request accepted","server":"TripServer","handler":"CreateTrip","client_id":"11111111-4444-1111-1111-111111111166"}
+{"time":"2026-09-11T15:28:56.2666273+03:00","level":"INFO","msg":"create trip completed","server":"TripServer","handler":"CreateTrip","client_id":"11111111-4444-1111-1111-111111111166","trip_id":"eb65d987-1e86-422c-8784-6819530ef7e3"}
+{"time":"2026-09-12T16:16:36.2051462+03:00","level":"INFO","msg":"Loading env file"}
+{"time":"2026-09-12T16:17:37.7649675+03:00","level":"INFO","msg":"create trip request accepted","server":"TripServer","handler":"CreateTrip","client_id":"21112222-4444-1111-1111-111111111166"}
+{"time":"2026-09-12T16:17:37.7649675+03:00","level":"INFO","msg":"create trip started","service":"TripService","operation":"CreateTrip","client_id":"21112222-4444-1111-1111-111111111166"}
+{"time":"2026-09-12T16:17:37.7649675+03:00","level":"INFO","msg":"begin transaction","layer":"transaction"}
+{"time":"2026-09-12T16:17:37.8119767+03:00","level":"INFO","msg":"transaction started","service":"TripService","operation":"CreateTrip","client_id":"21112222-4444-1111-1111-111111111166","layer":"transaction"}
+{"time":"2026-09-12T16:17:37.8119767+03:00","level":"INFO","msg":"create trip usecase started","layer":"usecase","usecase":"TripUsecase.CreateTrip","client_id":"21112222-4444-1111-1111-111111111166"}
+{"time":"2026-09-12T16:17:37.8119767+03:00","level":"INFO","msg":"insert trip started","layer":"repository","repository":"TripRepository","operation":"Create","trip_id":"95e39544-2de5-4457-805a-b4f853dfc752","client_id":"21112222-4444-1111-1111-111111111166"}
+{"time":"2026-09-12T16:17:37.8205366+03:00","level":"INFO","msg":"insert trip completed","layer":"repository","repository":"TripRepository","operation":"Create","trip_id":"95e39544-2de5-4457-805a-b4f853dfc752","client_id":"21112222-4444-1111-1111-111111111166"}
+{"time":"2026-09-12T16:17:37.8247298+03:00","level":"INFO","msg":"create trip usecase completed","layer":"usecase","usecase":"TripUsecase.CreateTrip","client_id":"21112222-4444-1111-1111-111111111166","trip_id":"95e39544-2de5-4457-805a-b4f853dfc752"}
+{"time":"2026-09-12T16:17:37.8247298+03:00","level":"INFO","msg":"transaction completed","service":"TripService","operation":"CreateTrip","client_id":"21112222-4444-1111-1111-111111111166","layer":"transaction","trip_id":"95e39544-2de5-4457-805a-b4f853dfc752"}
+{"time":"2026-09-12T16:17:37.8328907+03:00","level":"INFO","msg":"commit transaction","layer":"transaction"}
+{"time":"2026-09-12T16:17:37.8328907+03:00","level":"INFO","msg":"create trip completed","service":"TripService","operation":"CreateTrip","client_id":"21112222-4444-1111-1111-111111111166","trip_id":"95e39544-2de5-4457-805a-b4f853dfc752"}
+{"time":"2026-09-12T16:17:37.8328907+03:00","level":"INFO","msg":"create trip completed","server":"TripServer","handler":"CreateTrip","client_id":"21112222-4444-1111-1111-111111111166","trip_id":"95e39544-2de5-4457-805a-b4f853dfc752"}

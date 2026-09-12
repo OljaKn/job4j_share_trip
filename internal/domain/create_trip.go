@@ -3,10 +3,13 @@ package domain
 import (
 	"context"
 	"errors"
+	"fmt"
+	"log/slog"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+	"job4j.ru/go-share-trip/internal/observability/logctx"
 )
 
 func NewTrip(driverId uuid.UUID, fromPoint string, toPoint string, departureTime time.Time, seats int) (*Trip, error) {
@@ -30,14 +33,33 @@ func NewTrip(driverId uuid.UUID, fromPoint string, toPoint string, departureTime
 }
 
 func CreateTrip(ctx context.Context, tx pgx.Tx, repo TripRepository, driverId uuid.UUID, fromPoint string, toPoint string, departureTime time.Time, seats int) (*Trip, error) {
+	logger := logctx.Logger(ctx).With(
+		slog.String("layer", "usecase"),
+		slog.String("usecase", "TripUsecase.CreateTrip"),
+		slog.String("client_id", driverId.String()),
+	)
+	logger.Info("create trip usecase started")
 	trip, err := NewTrip(driverId, fromPoint, toPoint, departureTime, seats)
 	if err != nil {
+		logger.Warn(
+			"create trip validation failed",
+			slog.Any("error", err),
+		)
 		return nil, err
 	}
 
 	err = repo.Create(ctx, tx, trip)
 	if err != nil {
-		return nil, err
+		logger.Error(
+			"repository create trip failed",
+			slog.Any("error", err),
+		)
+		return nil, fmt.Errorf("repoTrip.Create: %w", err)
 	}
+
+	logger.Info(
+		"create trip usecase completed",
+		slog.String("trip_id", trip.Id.String()),
+	)
 	return trip, nil
 }
