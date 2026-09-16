@@ -46,3 +46,13 @@ func (c DBConfig) DSN() string {
 		c.User, c.Password, c.Host, c.Port, c.DBName, ssl,
 	)
 }
+
+type ServerConfig struct {
+	Port string
+}
+
+func GetServerConfig() ServerConfig {
+	return ServerConfig{
+		Port: os.Getenv("SERVER_PORT"),
+	}
+}

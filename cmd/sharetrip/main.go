@@ -43,6 +43,6 @@ func main() {
 	app.Use(middleware.Correlation(logger))
 
 	handler.Route(app.Group(""))
-
-	log.Fatal(app.Listen(":8080"))
+	port := configs.GetServerConfig()
+	log.Fatal(app.Listen(":" + port.Port))
 }
