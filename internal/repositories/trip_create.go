@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
@@ -12,6 +13,20 @@ import (
 )
 
 func (r *RepoPg) Create(ctx context.Context, tx pgx.Tx, tr *domain.Trip) error {
+	started := time.Now()
+	result := "success"
+
+	defer func() {
+		r.metrics.RepositoryQueryTotal.WithLabelValues(
+			"trip_create",
+			result,
+		).Inc()
+
+		r.metrics.RepositoryQueryDuration.WithLabelValues(
+			"trip_create",
+			result,
+		).Observe(time.Since(started).Seconds())
+	}()
 	logger := logctx.Logger(ctx).With(
 		slog.String("layer", "repository"),
 		slog.String("repository", "TripRepository"),

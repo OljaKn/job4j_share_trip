@@ -53,6 +53,20 @@ func (r *RepoPg) Update(
 	tx pgx.Tx,
 	trip *domain.Trip,
 ) (*domain.Trip, error) {
+	started := time.Now()
+	result := "success"
+
+	defer func() {
+		r.metrics.RepositoryQueryTotal.WithLabelValues(
+			"trip_update",
+			result,
+		).Inc()
+
+		r.metrics.RepositoryQueryDuration.WithLabelValues(
+			"trip_update",
+			result,
+		).Observe(time.Since(started).Seconds())
+	}()
 	_, err := tx.Exec(ctx,
 		`UPDATE trips SET status = $1 WHERE id = $2`,
 		trip.Status, trip.Id)

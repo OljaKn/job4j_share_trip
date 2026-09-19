@@ -1,0 +1,66 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_PROMETHEUS",
+      "label": "Prometheus",
+      "type": "datasource",
+      "pluginId": "prometheus",
+      "pluginName": "Prometheus"
+    }
+  ],
+  "title": "ShareTrip Runtime Go",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "10s",
+  "time": {
+    "from": "now-15m",
+    "to": "now"
+  },
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Goroutines",
+      "gridPos": { "x": 0, "y": 0, "w": 6, "h": 4 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "targets": [
+        { "expr": "go_goroutines", "legendFormat": "goroutines" }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Heap allocated",
+      "gridPos": { "x": 6, "y": 0, "w": 9, "h": 7 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "targets": [
+        { "expr": "go_memstats_heap_alloc_bytes", "legendFormat": "heap" }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "GC cycles",
+      "gridPos": { "x": 15, "y": 0, "w": 9, "h": 7 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "targets": [
+        { "expr": "rate(go_gc_duration_seconds_count[5m])", "legendFormat": "gc/sec" }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Process CPU",
+      "gridPos": { "x": 0, "y": 7, "w": 12, "h": 7 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "targets": [
+        { "expr": "rate(process_cpu_seconds_total[5m])", "legendFormat": "cpu" }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Resident memory",
+      "gridPos": { "x": 12, "y": 7, "w": 12, "h": 7 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "targets": [
+        { "expr": "process_resident_memory_bytes", "legendFormat": "rss" }
+      ]
+    }
+  ]
+}

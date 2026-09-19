@@ -21,6 +21,15 @@ type CreateTripCommand struct {
 }
 
 func (s *Service) CreateTrip(ctx context.Context, com CreateTripCommand) (*domain.Trip, error) {
+	started := time.Now()
+	result := "success"
+
+	defer func() {
+		s.metrics.TripCreateTotal.WithLabelValues(result).Inc()
+		s.metrics.TripCreateDuration.WithLabelValues(result).
+			Observe(time.Since(started).Seconds())
+	}()
+
 	logger := logctx.Logger(ctx).With(
 		slog.String("service", "TripService"),
 		slog.String("operation", "CreateTrip"),

@@ -17,6 +17,14 @@ type PublishTripCommand struct {
 }
 
 func (s *Service) PublishTrip(ctx context.Context, com PublishTripCommand) (*domain.Trip, error) {
+	started := time.Now()
+	result := "success"
+
+	defer func() {
+		s.metrics.TripPublishTotal.WithLabelValues(result).Inc()
+		s.metrics.TripPublishDuration.WithLabelValues(result).
+			Observe(time.Since(started).Seconds())
+	}()
 	return tx(ctx, s.pool, func(tx pgx.Tx) (*domain.Trip, error) {
 		trip, statusChanged, err := domain.MoveTripDraftToPublish(
 			ctx,

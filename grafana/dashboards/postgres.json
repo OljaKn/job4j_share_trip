@@ -1,0 +1,66 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_PROMETHEUS",
+      "label": "Prometheus",
+      "type": "datasource",
+      "pluginId": "prometheus",
+      "pluginName": "Prometheus"
+    }
+  ],
+  "title": "ShareTrip PostgreSQL",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "10s",
+  "time": {
+    "from": "now-15m",
+    "to": "now"
+  },
+  "panels": [
+    {
+      "type": "stat",
+      "title": "PostgreSQL up",
+      "gridPos": { "x": 0, "y": 0, "w": 6, "h": 4 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "targets": [
+        { "expr": "pg_up", "legendFormat": "up" }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Connections",
+      "gridPos": { "x": 6, "y": 0, "w": 9, "h": 7 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "targets": [
+        { "expr": "pg_stat_database_numbackends", "legendFormat": "{{datname}}" }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Commits per second",
+      "gridPos": { "x": 15, "y": 0, "w": 9, "h": 7 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "targets": [
+        { "expr": "rate(pg_stat_database_xact_commit[5m])", "legendFormat": "{{datname}}" }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Rollbacks per second",
+      "gridPos": { "x": 0, "y": 7, "w": 12, "h": 7 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "targets": [
+        { "expr": "rate(pg_stat_database_xact_rollback[5m])", "legendFormat": "{{datname}}" }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Database size",
+      "gridPos": { "x": 12, "y": 7, "w": 12, "h": 7 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "targets": [
+        { "expr": "pg_database_size_bytes", "legendFormat": "{{datname}}" }
+      ]
+    }
+  ]
+}

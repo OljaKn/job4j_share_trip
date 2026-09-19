@@ -6,10 +6,12 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/prometheus/client_golang/prometheus"
 	"job4j.ru/go-share-trip/configs"
 	"job4j.ru/go-share-trip/internal/api"
 	"job4j.ru/go-share-trip/internal/app"
 	"job4j.ru/go-share-trip/internal/middleware"
+	"job4j.ru/go-share-trip/internal/observability/metrics"
 	"job4j.ru/go-share-trip/internal/repositories"
 	"job4j.ru/go-share-trip/internal/service"
 )
@@ -33,16 +35,20 @@ func main() {
 		log.Fatal("connection fail:", err)
 	}
 	defer dbPool.Close()
-
-	repo := repositories.NewRepoPg(dbPool)
+	registry := prometheus.NewRegistry()
+	m := metrics.New(registry)
+	repo := repositories.NewRepoPg(m, dbPool)
 	outboxRepo := repositories.NewOutboxRepo(dbPool)
-	service := service.NewTripService(repo, outboxRepo, dbPool)
-	handler := api.NewServer(service)
-	app := fiber.New()
+	service := service.NewTripService(m, repo, outboxRepo, dbPool)
+	handler := api.NewServer(service, registry, m)
+	app := fiber.New(fiber.Config{
+		EnablePrintRoutes: true,
+	})
 
 	app.Use(middleware.Correlation(logger))
-
+	app.Use(api.NewHTTPMetricsMiddleware(m))
 	handler.Route(app.Group(""))
 	port := configs.GetServerConfig()
 	log.Fatal(app.Listen(":" + port.Port))
+
 }
