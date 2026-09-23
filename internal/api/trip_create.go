@@ -38,22 +38,15 @@ func (h *Server) CreateTrip(c *fiber.Ctx) error {
 	)
 	var req CreateTripRequest
 	if err := c.BodyParser(&req); err != nil {
-		logger.Warn(
-			"create trip failed: invalid json body",
-			slog.Any("error", err),
-		)
 		return fiber.NewError(fiber.StatusBadRequest, "invalid JSON body")
 	}
 	if req.DriverId == uuid.Nil {
-		logger.Warn("create trip failed: client_id is required")
 		return fiber.NewError(fiber.StatusBadRequest, "driver_id is required")
 	}
 	if req.FromPoint == "" {
-		logger.Warn("create trip failed: fromPoint is required")
 		return fiber.NewError(fiber.StatusBadRequest, "point of departure is required")
 	}
 	if req.ToPoint == "" {
-		logger.Warn("create trip failed: toPoint is required")
 		return fiber.NewError(fiber.StatusBadRequest, "point of arrival is required")
 	}
 	logger = logger.With(
@@ -62,7 +55,6 @@ func (h *Server) CreateTrip(c *fiber.Ctx) error {
 
 	ctx = logctx.WithLogger(ctx, logger)
 
-	logger.Info("create trip request accepted")
 	cmd := service.CreateTripCommand{
 		DriverId:      req.DriverId,
 		FromPoint:     req.FromPoint,

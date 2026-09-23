@@ -46,7 +46,7 @@ func main() {
 	})
 
 	app.Use(middleware.Correlation(logger))
-	app.Use(api.NewHTTPMetricsMiddleware(m))
+	app.Use(middleware.NewHTTPMetricsMiddleware(m))
 	handler.Route(app.Group(""))
 	port := configs.GetServerConfig()
 	log.Fatal(app.Listen(":" + port.Port))
