@@ -5,10 +5,15 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
+	"go.opentelemetry.io/otel"
 	"job4j.ru/go-share-trip/internal/domain"
 )
 
 func (r *RepoPg) Get(ctx context.Context, id uuid.UUID) (*domain.Trip, error) {
+	tracer := otel.Tracer("TripRepository")
+
+	ctx, span := tracer.Start(ctx, "TripRepository.GetByID")
+	defer span.End()
 	var trip domain.Trip
 	err := r.pool.QueryRow(
 		ctx,

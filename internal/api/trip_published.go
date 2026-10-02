@@ -7,6 +7,8 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/google/uuid"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 	"job4j.ru/go-share-trip/internal/domain"
 	"job4j.ru/go-share-trip/internal/service"
 )
@@ -27,6 +29,12 @@ type PublishTripResponse struct {
 }
 
 func (h *Server) PublishTrip(c *fiber.Ctx) error {
+	tracer := otel.Tracer("trip-api")
+
+	ctx, span := tracer.Start(c.UserContext(), "PublishTripHandler")
+	defer span.End()
+
+	c.Set("trace-id", span.SpanContext().TraceID().String())
 	var req PublishTripRequest
 	if err := c.BodyParser(&req); err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, "invalid JSON body")
@@ -37,8 +45,11 @@ func (h *Server) PublishTrip(c *fiber.Ctx) error {
 	if req.DriverId == uuid.Nil {
 		return fiber.NewError(fiber.StatusBadRequest, "driver_id is required")
 	}
-
-	trip, err := h.server.PublishTrip(c.Context(), service.PublishTripCommand{
+	span.SetAttributes(
+		attribute.String("trip_id", req.TripId.String()),
+		attribute.String("driver_id", req.DriverId.String()),
+	)
+	trip, err := h.server.PublishTrip(ctx, service.PublishTripCommand{
 		TripId:   req.TripId,
 		DriverId: req.DriverId,
 	})
@@ -58,7 +69,9 @@ func (h *Server) PublishTrip(c *fiber.Ctx) error {
 		log.Errorw("PublishTrip", err)
 		return fiber.NewError(fiber.StatusInternalServerError, "internal server error")
 	}
-
+	span.SetAttributes(
+		attribute.String("trip_status", string(trip.Status)),
+	)
 	return c.Status(fiber.StatusOK).JSON(PublishTripResponse{
 		ID:            trip.Id,
 		DriverId:      trip.DriverId,

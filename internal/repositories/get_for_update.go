@@ -8,6 +8,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+	"go.opentelemetry.io/otel"
 	"job4j.ru/go-share-trip/internal/domain"
 )
 
@@ -16,6 +17,10 @@ func (r *RepoPg) GetForUpdateByID(
 	tx pgx.Tx,
 	id uuid.UUID,
 ) (*domain.Trip, error) {
+	tracer := otel.Tracer("TripRepository")
+
+	ctx, span := tracer.Start(ctx, "TripRepository.GetForUpdateByID")
+	defer span.End()
 	var trip domain.Trip
 	err := tx.QueryRow(ctx, `
 		SELECT
@@ -53,6 +58,10 @@ func (r *RepoPg) Update(
 	tx pgx.Tx,
 	trip *domain.Trip,
 ) (*domain.Trip, error) {
+	tracer := otel.Tracer("TripRepository")
+
+	ctx, span := tracer.Start(ctx, "TripRepository.Update")
+	defer span.End()
 	started := time.Now()
 	result := "success"
 

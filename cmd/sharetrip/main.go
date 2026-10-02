@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"log"
+	"os"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -12,6 +14,7 @@ import (
 	"job4j.ru/go-share-trip/internal/app"
 	"job4j.ru/go-share-trip/internal/middleware"
 	"job4j.ru/go-share-trip/internal/observability/metrics"
+	"job4j.ru/go-share-trip/internal/observability/tracing"
 	"job4j.ru/go-share-trip/internal/repositories"
 	"job4j.ru/go-share-trip/internal/service"
 )
@@ -35,6 +38,28 @@ func main() {
 		log.Fatal("connection fail:", err)
 	}
 	defer dbPool.Close()
+	tp, err := tracing.NewProvider(ctx, tracing.Config{
+		ServiceName:    "share-trip",
+		ServiceVersion: "1.0.0",
+		Environment:    "local",
+		Endpoint:       "localhost:4319",
+	})
+	if err != nil {
+		logger.Error("init tracing failed", "error", err)
+		os.Exit(1)
+	}
+
+	defer func() {
+		shutdownCtx, cancel := context.WithTimeout(
+			context.Background(),
+			5*time.Second,
+		)
+		defer cancel()
+
+		if err := tp.Shutdown(shutdownCtx); err != nil {
+			logger.Error("shutdown tracing failed", "error", err)
+		}
+	}()
 	registry := prometheus.NewRegistry()
 	m := metrics.New(registry)
 	repo := repositories.NewRepoPg(m, dbPool)
@@ -47,6 +72,7 @@ func main() {
 
 	app.Use(middleware.Correlation(logger))
 	app.Use(middleware.NewHTTPMetricsMiddleware(m))
+	app.Use(tracing.NewFiberMiddleware())
 	handler.Route(app.Group(""))
 	port := configs.GetServerConfig()
 	log.Fatal(app.Listen(":" + port.Port))

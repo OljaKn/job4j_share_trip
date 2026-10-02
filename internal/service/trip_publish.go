@@ -8,6 +8,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+	"go.opentelemetry.io/otel"
 	"job4j.ru/go-share-trip/internal/domain"
 )
 
@@ -17,6 +18,8 @@ type PublishTripCommand struct {
 }
 
 func (s *Service) PublishTrip(ctx context.Context, com PublishTripCommand) (*domain.Trip, error) {
+	ctx, span := otel.Tracer("TripService").Start(ctx, "TripService.PublishTrip")
+	defer span.End()
 	started := time.Now()
 	result := "success"
 
