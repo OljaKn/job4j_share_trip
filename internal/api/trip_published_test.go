@@ -48,6 +48,7 @@ func TestServer_PublishTrip(t *testing.T) {
 			bytes.NewReader(body),
 		)
 		require.NoError(t, err)
+		req.Host = "localhost"
 		req.Header.Set("Content-Type", "application/json")
 
 		resp, err := testApp.Test(req, -1)
