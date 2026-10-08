@@ -61,17 +61,17 @@ func main() {
 		}
 	}()
 	registry := prometheus.NewRegistry()
-	m := metrics.New(registry)
-	repo := repositories.NewRepoPg(m, dbPool)
+	metric := metrics.New(registry)
+	repo := repositories.NewRepoPg(metric, dbPool)
 	outboxRepo := repositories.NewOutboxRepo(dbPool)
-	service := service.NewTripService(m, repo, outboxRepo, dbPool)
-	handler := api.NewServer(service, registry, m)
+	service := service.NewTripService(metric, repo, outboxRepo, dbPool)
+	handler := api.NewServer(service, registry, metric)
 	app := fiber.New(fiber.Config{
 		EnablePrintRoutes: true,
 	})
 
 	app.Use(middleware.Correlation(logger))
-	app.Use(middleware.NewHTTPMetricsMiddleware(m))
+	app.Use(middleware.NewHTTPMetricsMiddleware(metric))
 	app.Use(tracing.NewFiberMiddleware())
 	handler.Route(app.Group(""))
 	port := configs.GetServerConfig()
