@@ -15,6 +15,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 	"job4j.ru/go-share-trip/internal/api"
+	"job4j.ru/go-share-trip/internal/middleware"
 	"job4j.ru/go-share-trip/internal/observability/metrics"
 	"job4j.ru/go-share-trip/internal/repositories"
 	"job4j.ru/go-share-trip/internal/service"
@@ -79,6 +80,20 @@ func TestMain(m *testing.M) {
 	server := api.NewServer(tripService, registry, metrics)
 
 	testApp = fiber.New()
+	testApp.Use(func(c *fiber.Ctx) error {
+		c.Locals(middleware.KeycloakClaimsKey, &middleware.KeycloakClaims{
+			Subject: "11111111-1111-4111-8111-111111111111",
+			ResourceAccess: map[string]struct {
+				Roles []string `json:"roles"`
+			}{
+				"sharetrip-api": {
+					Roles: []string{"client"},
+				},
+			},
+		})
+
+		return c.Next()
+	})
 	server.Route(testApp.Group(""))
 
 	code := m.Run()

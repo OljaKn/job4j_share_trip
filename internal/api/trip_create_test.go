@@ -18,7 +18,6 @@ func TestServer_CreateTrip(t *testing.T) {
 	t.Run("success - создание поездки", func(t *testing.T) {
 		t.Parallel()
 		payload := api.CreateTripRequest{
-			DriverId:      uuid.New(),
 			FromPoint:     "Казань",
 			ToPoint:       "Москва",
 			DepartureTime: time.Now().Add(1 * time.Hour).UTC().Truncate(time.Second),
@@ -55,8 +54,12 @@ func TestServer_CreateTrip(t *testing.T) {
 		require.NoError(t, err)
 
 		require.NotEqual(t, uuid.Nil, got.ID)
+		expectedDriverID, err := uuid.Parse(
+			"11111111-1111-4111-8111-111111111111",
+		)
+		require.NoError(t, err)
 
-		require.Equal(t, payload.DriverId, got.DriverId)
+		require.Equal(t, expectedDriverID, got.DriverId)
 		require.Equal(t, payload.FromPoint, got.FromPoint)
 		require.Equal(t, payload.ToPoint, got.ToPoint)
 		require.Equal(t, payload.Seats, got.Seats)

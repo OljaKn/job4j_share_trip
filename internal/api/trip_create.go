@@ -6,12 +6,12 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
+	"job4j.ru/go-share-trip/internal/middleware"
 	"job4j.ru/go-share-trip/internal/observability/logctx"
 	"job4j.ru/go-share-trip/internal/service"
 )
 
 type CreateTripRequest struct {
-	DriverId      uuid.UUID `json:"driver_id"`
 	FromPoint     string    `json:"from_point"`
 	ToPoint       string    `json:"to_point"`
 	DepartureTime time.Time `json:"departure_time"`
@@ -36,12 +36,19 @@ func (h *Server) CreateTrip(c *fiber.Ctx) error {
 		slog.String("server", "TripServer"),
 		slog.String("handler", "CreateTrip"),
 	)
+
+	claims, err := middleware.ClaimsFromContext(c)
+	if err != nil {
+		return err
+	}
+	clientID := claims.Subject
+	driverId, err := uuid.Parse(clientID)
+	if err != nil {
+		return fiber.NewError(fiber.StatusUnauthorized, "invalid client_id token")
+	}
 	var req CreateTripRequest
 	if err := c.BodyParser(&req); err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, "invalid JSON body")
-	}
-	if req.DriverId == uuid.Nil {
-		return fiber.NewError(fiber.StatusBadRequest, "driver_id is required")
 	}
 	if req.FromPoint == "" {
 		return fiber.NewError(fiber.StatusBadRequest, "point of departure is required")
@@ -50,13 +57,13 @@ func (h *Server) CreateTrip(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusBadRequest, "point of arrival is required")
 	}
 	logger = logger.With(
-		slog.String("client_id", req.DriverId.String()),
+		slog.String("client_id", clientID),
 	)
 
 	ctx = logctx.WithLogger(ctx, logger)
 
 	cmd := service.CreateTripCommand{
-		DriverId:      req.DriverId,
+		DriverId:      driverId,
 		FromPoint:     req.FromPoint,
 		ToPoint:       req.ToPoint,
 		DepartureTime: req.DepartureTime,

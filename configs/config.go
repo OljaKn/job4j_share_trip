@@ -56,3 +56,10 @@ func GetServerConfig() ServerConfig {
 		Port: os.Getenv("SERVER_PORT"),
 	}
 }
+
+func Env(key, defaultValue string) string {
+	if value := os.Getenv(key); value != "" {
+		return value
+	}
+	return defaultValue
+}

@@ -66,6 +66,7 @@ func main() {
 	outboxRepo := repositories.NewOutboxRepo(dbPool)
 	service := service.NewTripService(metric, repo, outboxRepo, dbPool)
 	handler := api.NewServer(service, registry, metric)
+	keycloakClientID := configs.Env("KEYCLOAK_CLIENT_ID", "sharetrip-api")
 	app := fiber.New(fiber.Config{
 		EnablePrintRoutes: true,
 	})
@@ -73,6 +74,13 @@ func main() {
 	app.Use(middleware.Correlation(logger))
 	app.Use(middleware.NewHTTPMetricsMiddleware(metric))
 	app.Use(tracing.NewFiberMiddleware())
+	app.Use(middleware.KeycloakRefreshTokenMiddleware(
+		middleware.KeycloakConfig{
+			Issuer:       configs.Env("KEYCLOAK_ISSUER", "http://localhost:8087/realms/sharetrip"),
+			ClientID:     keycloakClientID,
+			ClientSecret: configs.Env("KEYCLOAK_CLIENT_SECRET", "secret"),
+		},
+	))
 	handler.Route(app.Group(""))
 	port := configs.GetServerConfig()
 	log.Fatal(app.Listen(":" + port.Port))
